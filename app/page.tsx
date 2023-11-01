@@ -19,9 +19,9 @@ export default async function IndexPage({
 
   return (
     <main className="p-4 md:p-10 mx-auto max-w-7xl">
-      <Title>Users</Title>
+      <Title>Your past receipts</Title>
       <Text>
-        A list of users retrieved from a MySQL database (PlanetScale).
+        Click to view your past receipts in detail.
       </Text>
       <Search />
       <Card className="mt-6">
