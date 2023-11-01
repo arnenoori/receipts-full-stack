@@ -59,6 +59,8 @@ Insert INSTALL commands
 3.Start the development mode:
 ```sh 
 Insert RUN commands 
+
+npm run dev
 ```
 
 ## 🙌 Contributors
