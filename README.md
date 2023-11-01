@@ -1,6 +1,6 @@
 <p align="center">
 <a href=https://github.com/arnenoori/307-project target="_blank">
-<img src='/placeholder.jpg' width="100%" alt="Banner" />
+<img src='/assets/UML.png' width="100%" alt="Banner" />
 </a>
 </p>
 
