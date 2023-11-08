@@ -93,4 +93,13 @@ Quotes- Use single quotes instead of double quotes
 Tab Width- Specifys the number of spaces per indentation-level, we are doing 2
 
 Trailing Commas- No trailing commas
+
+Prettier Installation:
+
+Install through VS Code extensions. Search for Prettier - Code formatter
+
+Or
+
+Can also be installed in VS Code: Launch VS Code Quick Open (Ctrl+P), paste the following command, and press enter.
+ext install esbenp.prettier-vscode
 ```
