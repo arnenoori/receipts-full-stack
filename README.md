@@ -81,3 +81,16 @@ npm run dev
         </a>
       </td></table>
 
+## Contributing
+
+```
+Style guidelines:
+
+Arrow Function Parentheses- Always include parentheses around a sole arrow function parameter
+
+Quotes- Use single quotes instead of double quotes
+
+Tab Width- Specifys the number of spaces per indentation-level, we are doing 2
+
+Trailing Commas- No trailing commas
+```
