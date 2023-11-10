@@ -18,7 +18,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ClerkProvider>
+    <ClerkProvider frontendApi="your-clerk-frontend-api">
       <html lang="en" className="h-full bg-gray-50">
         <body className="h-full">
           <Suspense>

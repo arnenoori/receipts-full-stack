@@ -1,7 +1,5 @@
-import { getAuth } from '@clerk/nextjs/server'
-import { NextResponse } from 'next/server'
 import { authMiddleware } from "@clerk/nextjs";
-import type { NextRequest } from 'next/server'
+import { NextRequest, Response } from 'next/server'
 
 const publicPaths = ['/', '/sign-in*', '/sign-up*']
 
@@ -11,19 +9,21 @@ const isPublic = (path: string) => {
   )
 }
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   if (isPublic(request.nextUrl.pathname)) {
-    return NextResponse.next()
+    return new Response(null, { status: 200 })
   }
 
-  const { userId } = getAuth(request)
+  // Use Clerk's authMiddleware function
+  const authResult = await authMiddleware()(request)
 
-  if (!userId) {
+  if (!authResult.next) {
     const signInUrl = new URL('/sign-in', request.url)
     signInUrl.searchParams.set('redirect_url', request.url)
-    return NextResponse.redirect(signInUrl)
+    return new Response(null, { status: 302, headers: { Location: signInUrl.toString() } })
   }
 
-  return NextResponse.next()
+  return new Response(null, { status: 200 })
 } 
+
 export const config = { matcher: '/((?!.*\\.).*)' }

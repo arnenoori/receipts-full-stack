@@ -1,8 +1,8 @@
 import React from 'react';
 import { Title, Text } from '@tremor/react';
-import Input from "@/components/ui/input";
-import Label from "@/components/ui/label";
-import Button from "@/components/ui/button";
+import Input from "frontend/lib/app/components/ui/input";
+import Label from "frontend/lib/app/components/ui/label";
+import Button from "frontend/lib/app/components/ui/button";
 
 const Component: React.FC = () => {
     return (

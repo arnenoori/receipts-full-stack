@@ -1,5 +1,5 @@
 import { Card, Title, Text } from '@tremor/react';
-import { queryBuilder } from '../lib/planetscale';
+import { queryBuilder } from '../planetscale';
 import Search from './search';
 import UsersTable from './table';
 import UploadReceipts from './UploadReceipts';
@@ -12,8 +12,7 @@ export default async function IndexPage({
   searchParams: { q: string };
 }) {
   const search = searchParams.q ?? '';
-  const users = await queryBuilder
-    .selectFrom('users')
+  const { data: users, error } = await supabase.from('users').select('*')
     .select(['id', 'name', 'username', 'email'])
     .where('name', 'like', `%${search}%`)
     .execute();

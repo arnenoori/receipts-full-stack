@@ -16,7 +16,7 @@
     "incremental": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["app/*"]
+      "@/*": ["frontend/lib/app/*"]
     },
     "plugins": [
       {
@@ -24,6 +24,6 @@
       }
     ]
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "include": ["frontend/next-env.d.ts", "**/*.ts", "**/*.tsx", "frontend/lib/.next/types/**/*.ts"],
   "exclude": ["node_modules"]
 }
