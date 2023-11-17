@@ -14,6 +14,7 @@ router = APIRouter(
 class NewTransaction(BaseModel):
     merchant: str
     description: str
+    date: str
 
 # gets all transactions for a user
 @router.get("/", tags=["transaction"])
@@ -46,17 +47,18 @@ def create_transaction(user_id: int, transaction: NewTransaction):
     """ """
     merchant = transaction.merchant
     description = transaction.description
+    date = transaction.date
 
     try: 
         with db.engine.begin() as connection:
             transaction_id = connection.execute(
                 sqlalchemy.text(
                     """
-                    INSERT INTO transactions (user_id, merchant, description)
-                    VALUES (:user_id, :merchant, :description)
+                    INSERT INTO transactions (user_id, merchant, description, date)
+                    VALUES (:user_id, :merchant, :description, :date)
                     RETURNING id
                     """
-                ), [{"user_id": user_id, "merchant": merchant, "description": description}]).scalar_one()
+                ), [{"user_id": user_id, "merchant": merchant, "description": description, "date": date}]).scalar_one()
     except DBAPIError as error:
         print(f"Error returned: <<<{error}>>>")
 

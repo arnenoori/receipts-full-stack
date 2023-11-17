@@ -16,6 +16,7 @@ router = APIRouter(
 class NewPurchase(BaseModel):
     item: str
     price: float
+    quantity: int
     category: str
     warranty_date: str
     return_date: str
@@ -73,6 +74,7 @@ def create_purchase(user_id: int, transaction_id: int, purchase: NewPurchase):
                     RETURNING id
                     """
                 ), [{"transaction_id": transaction_id, "item": item, "price": price, "quantity": quantity, "warranty_date": warranty_date, "return_date": return_date}]).scalar_one()
+            print("purchase inserted: {0}".format(item))
     except DBAPIError as error:
         print(f"Error returned: <<<{error}>>>")
 
