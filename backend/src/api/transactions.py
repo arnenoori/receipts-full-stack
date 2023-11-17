@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from src.api import auth
 import sqlalchemy
@@ -14,6 +14,7 @@ router = APIRouter(
 class NewTransaction(BaseModel):
     merchant: str
     description: str
+    date: str
 
 # gets all transactions for a user
 @router.get("/", tags=["transaction"])
@@ -46,17 +47,18 @@ def create_transaction(user_id: int, transaction: NewTransaction):
     """ """
     merchant = transaction.merchant
     description = transaction.description
+    date = transaction.date
 
     try: 
         with db.engine.begin() as connection:
             transaction_id = connection.execute(
                 sqlalchemy.text(
                     """
-                    INSERT INTO transactions (user_id, merchant, description)
-                    VALUES (:user_id, :merchant, :description)
+                    INSERT INTO transactions (user_id, merchant, description, date)
+                    VALUES (:user_id, :merchant, :description, :date)
                     RETURNING id
                     """
-                ), [{"user_id": user_id, "merchant": merchant, "description": description}]).scalar_one()
+                ), [{"user_id": user_id, "merchant": merchant, "description": description, "date": date}]).scalar_one()
     except DBAPIError as error:
         print(f"Error returned: <<<{error}>>>")
 
@@ -66,26 +68,27 @@ def create_transaction(user_id: int, transaction: NewTransaction):
 
 
 # gets a specific transaction for a user
-@router.get("/{transaction_id}", tags=["transaction"])
-def get_transaction(user_id: int, transaction_id: int):
+@router.get("/", tags=["transaction"])
+def get_transactions(user_id: int, page: int = 1, page_size: int = 10):
     """ """
+    offset = (page - 1) * page_size
     try: 
         with db.engine.begin() as connection:
-            # ans stores query result as dictionary/json
             ans = connection.execute(
                 sqlalchemy.text(
                     """
                     SELECT merchant, description, created_at
                     FROM transactions
-                    WHERE id = :transaction_id
+                    WHERE user_id = :user_id
+                    ORDER BY created_at DESC
+                    LIMIT :page_size OFFSET :offset
                     """
-                ), [{"transaction_id": transaction_id}]).mappings().scalar_one()
+                ), [{"user_id": user_id, "page_size": page_size, "offset": offset}]).mappings().all()
     except DBAPIError as error:
         print(f"Error returned: <<<{error}>>>")
 
-    print(f"USER_{user_id}_TRANSACTION_{transaction_id}: {ans}")
+    print(f"USER_{user_id}_TRANSACTIONS_PAGE_{page}: {ans}")
 
-    # ex: {"merchant": "Walmart", "description": "got groceries", "created_at": "2021-05-01 12:00:00"}
     return ans
 
 # deletes a specific transaction for a user
@@ -94,13 +97,15 @@ def delete_transaction(user_id: int, transaction_id: int):
     """ """
     try:
         with db.engine.begin() as connection:
-            connection.execute(
+            result = connection.execute(
                 sqlalchemy.text(
                     """
                     DELETE FROM transactions
-                    WHERE id = :transaction_id
+                    WHERE id = :transaction_id AND user_id = :user_id
                     """
-                ), [{"transaction_id": transaction_id}])
+                ), [{"transaction_id": transaction_id, "user_id": user_id}])
+            if result.rowcount == 0:
+                raise HTTPException(status_code=404, detail="Transaction not found or not owned by user")
     except DBAPIError as error:
         print(f"Error returned: <<<{error}>>>")
 
@@ -115,15 +120,17 @@ def update_transaction(user_id: int, transaction_id: int, transaction: NewTransa
 
     try: 
         with db.engine.begin() as connection:
-            connection.execute(
+            result = connection.execute(
                 sqlalchemy.text(
                     """
                     UPDATE transactions
                     SET merchant = :merchant, description = :description
-                    WHERE id = :transaction_id
+                    WHERE id = :transaction_id AND user_id = :user_id
                     """
-                ), [{"transaction_id": transaction_id, "merchant": merchant, "description": description}])
+                ), [{"transaction_id": transaction_id, "user_id": user_id, "merchant": merchant, "description": description}])
+            if result.rowcount == 0:
+                raise HTTPException(status_code=404, detail="Transaction not found or not owned by user")
     except DBAPIError as error:
         print(f"Error returned: <<<{error}>>>")
 
-    return {"merchant": merchant, "description": description}
+    return {"transaction_id": transaction_id, "merchant": merchant, "description": description}
