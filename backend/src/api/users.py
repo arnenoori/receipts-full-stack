@@ -4,6 +4,8 @@ from src.api import auth
 import sqlalchemy
 from src import database as db
 from sqlalchemy.exc import DBAPIError
+from datetime import datetime, timedelta
+
 
 router = APIRouter(
     prefix="/user",
@@ -126,3 +128,62 @@ def update_user(user_id: int, new_user: NewUser):
         print(f"Error returned: <<<{error}>>>")
 
     return {"name": name, "email": email}
+
+
+# gets sum of money spent of different catagories of all purchases for a user
+@router.get("/{user_id}/categories", tags=["user"])
+def get_all_purchases_categorized(user_id: int):
+    """ """
+    ans = []
+
+    try: 
+        with db.engine.begin() as connection:
+            # ans stores query result as list of dictionaries/json
+            ans = connection.execute(
+                sqlalchemy.text(
+                    """
+                    SELECT category, SUM(price) AS total
+                    FROM purchases AS p
+                    JOIN transactions AS t ON p.transaction_id = t.id
+                    WHERE t.user_id = :user_id
+                    GROUP BY category
+                    ORDER BY total
+                    """
+                ), [{"user_id": user_id}]).mappings().all()
+    except DBAPIError as error:
+        print(f"Error returned: <<<{error}>>>")
+
+    print(f"USER_{user_id}_PURCHASES_CATAGORIZED: {ans}")
+
+    return ans
+
+# Get warranty of all purchases for a user 
+# and return purchases that are going to expire within a week
+@router.get("/{user_id}/warranty", tags=["user"])
+def get_all_purchases_warranty(user_id: int):
+    ans = []
+
+    try:
+        with db.engine.begin() as connection:
+            # Calculate the date one week from now
+            one_week_from_now = datetime.now() + timedelta(weeks=1)
+
+            # ans stores query result as a list of dictionaries/json
+            ans = connection.execute(
+                sqlalchemy.text(
+                    """
+                    SELECT item
+                    FROM purchases AS p
+                    JOIN transactions AS t ON p.transaction_id = t.id
+                    WHERE t.user_id = :user_id
+                    AND p.warranty_date::timestamp <= :one_week_from_now
+                    ORDER BY p.warranty_date
+                    """
+                ), {"user_id": user_id, "one_week_from_now": one_week_from_now}
+            ).mappings().all()
+    except DBAPIError as error:
+        print(f"Error returned: <<<{error}>>>")
+
+    print(f"USER_{user_id}_PURCHASES_WARRANTY: {ans}")
+
+    return ans
