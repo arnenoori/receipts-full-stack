@@ -3,7 +3,9 @@ from pydantic import BaseModel
 from src.api import auth
 import sqlalchemy
 from src import database as db
-from sqlalchemy.exc import DBAPIError
+from sqlalchemy.exc import DBAPIError, NoResultFound
+import re
+from datetime import datetime, timedelta
 
 router = APIRouter(
     prefix="/user",
@@ -15,6 +17,17 @@ class NewUser(BaseModel):
     name: str
     email: str
 
+def is_valid_email(email):
+    email_regex = r'^[A-Za-z0-9._+%-]+@[A-Za-z0-9.-]+[.][A-Za-z]+$'
+    return bool(re.match(email_regex, email))
+
+def is_valid_name(name):
+    name_regex = r'^[A-Za-z\'\-_]+$'
+    return bool(re.match(name_regex, name))
+
+check_user_query = "SELECT id FROM users WHERE id = :user_id"
+
+
 # creates a new user
 @router.post("/", tags=["user"])
 def create_user(new_user: NewUser):
@@ -23,18 +36,27 @@ def create_user(new_user: NewUser):
     email = new_user.email
     user_id = None
 
-    # Check if email already exists
-    with db.engine.begin() as connection:
-        result = connection.execute(
-            sqlalchemy.text(
-                """
-                SELECT id FROM users WHERE email = :email
-                """
-            ), [{"email": email}]).fetchone()
-        if result is not None:
-            raise HTTPException(status_code=400, detail="Email already in use")
+    # check if name is valid
+    if not is_valid_name(name):
+        raise HTTPException(status_code=400, detail="Invalid name")
+
+    # check if email is valid
+    if not is_valid_email(email):
+        raise HTTPException(status_code=400, detail="Invalid email")
 
     try:
+        # Check if email already exists
+        with db.engine.begin() as connection:
+            result = connection.execute(
+                sqlalchemy.text(
+                    """
+                    SELECT id FROM users WHERE email = :email
+                    """
+                ), [{"email": email}]).fetchone()
+            if result is not None:
+                raise HTTPException(status_code=409, detail="Email already in use")
+
+        # add user to database
         with db.engine.begin() as connection:
             user_id = connection.execute(
                 sqlalchemy.text(
@@ -45,7 +67,9 @@ def create_user(new_user: NewUser):
                     """
                 ), [{"name": name, "email": email}]).scalar_one()
     except DBAPIError as error:
-        print(f"Error returned: <<<{error}>>>")
+        print(f"DBAPIError returned: <<<{error}>>>")
+    except Exception as error:
+        print(f"Internal Server Error returned: <<<{error}>>>")
 
     return {"user_id": user_id}
 
@@ -65,16 +89,16 @@ def get_user(user_id: int):
                     FROM users
                     WHERE id = :user_id
                     """
-                ), [{"user_id": user_id}]).mappings().all()[0]
+                ), [{"user_id": user_id}]).fetchone()
+            if ans is None:
+                raise HTTPException(status_code=404, detail="User not found")
     except DBAPIError as error:
         print(f"Error returned: <<<{error}>>>")
 
-    if not ans: raise HTTPException(status_code=404, detail="User not found")
-
-    print(f"USER_{user_id}: {ans}")
+    print(f"USER_{user_id}: {ans.name}, {ans.email}")
 
     # ex: {"name": "John Doe", "email": "jdoe@gmail"}
-    return ans
+    return {"name": ans.name, "email": ans.email}
 
 # deletes a user
 @router.delete("/{user_id}", tags=["user"])
@@ -82,6 +106,14 @@ def delete_user(user_id: int):
     """ """
     try:
         with db.engine.begin() as connection:
+            # check if user exists
+            result = connection.execute(
+                sqlalchemy.text(check_user_query), 
+                [{"user_id": user_id}]).fetchone()
+            if result is None:
+                raise HTTPException(status_code=404, detail="User not found")
+            
+            # delete user
             connection.execute(
                 sqlalchemy.text(
                     """
@@ -101,19 +133,34 @@ def update_user(user_id: int, new_user: NewUser):
     name = new_user.name
     email = new_user.email
 
-    # Check if new email already exists
-    with db.engine.begin() as connection:
-        result = connection.execute(
-            sqlalchemy.text(
-                """
-                SELECT id FROM users WHERE email = :email
-                """
-            ), [{"email": email}]).fetchone()
-        if result is not None and result['id'] != user_id:
-            raise HTTPException(status_code=400, detail="Email already in use")
+    # check if name is valid
+    if not is_valid_name(name):
+        raise HTTPException(status_code=400, detail="Invalid name")
+
+    # check if email is valid
+    if not is_valid_email(email):
+        raise HTTPException(status_code=400, detail="Invalid email")
 
     try:
         with db.engine.begin() as connection:
+            # check if user exists
+            result = connection.execute(
+                sqlalchemy.text(check_user_query), 
+                [{"user_id": user_id}]).fetchone()
+            if result is None:
+                raise HTTPException(status_code=404, detail="User not found")
+            
+            # check if new email already exists
+            result = connection.execute(
+                sqlalchemy.text(
+                    """
+                    SELECT id FROM users WHERE email = :email
+                    """
+                ), [{"email": email}]).fetchone()
+            if result is not None and result.id != user_id:
+                raise HTTPException(status_code=409, detail="Email already in use")
+
+            # update user
             connection.execute(
                 sqlalchemy.text(
                     """
@@ -126,3 +173,61 @@ def update_user(user_id: int, new_user: NewUser):
         print(f"Error returned: <<<{error}>>>")
 
     return {"name": name, "email": email}
+
+# gets sum of money spent of different catagories of all purchases for a user
+@router.get("/{user_id}/categories", tags=["user"])
+def get_all_purchases_categorized(user_id: int):
+    """ """
+    ans = []
+
+    try: 
+        with db.engine.begin() as connection:
+            # ans stores query result as list of dictionaries/json
+            ans = connection.execute(
+                sqlalchemy.text(
+                    """
+                    SELECT category, SUM(price) AS total
+                    FROM purchases AS p
+                    JOIN transactions AS t ON p.transaction_id = t.id
+                    WHERE t.user_id = :user_id
+                    GROUP BY category
+                    ORDER BY total
+                    """
+                ), [{"user_id": user_id}]).mappings().all()
+    except DBAPIError as error:
+        print(f"Error returned: <<<{error}>>>")
+
+    print(f"USER_{user_id}_PURCHASES_CATAGORIZED: {ans}")
+
+    return ans
+
+# Get warranty of all purchases for a user 
+# and return purchases that are going to expire within a week
+@router.get("/{user_id}/warranty", tags=["user"])
+def get_all_purchases_warranty(user_id: int):
+    ans = []
+
+    try:
+        with db.engine.begin() as connection:
+            # Calculate the date one week from now
+            one_week_from_now = datetime.now() + timedelta(weeks=1)
+
+            # ans stores query result as a list of dictionaries/json
+            ans = connection.execute(
+                sqlalchemy.text(
+                    """
+                    SELECT item
+                    FROM purchases AS p
+                    JOIN transactions AS t ON p.transaction_id = t.id
+                    WHERE t.user_id = :user_id
+                    AND p.warranty_date::timestamp <= :one_week_from_now
+                    ORDER BY p.warranty_date
+                    """
+                ), {"user_id": user_id, "one_week_from_now": one_week_from_now}
+            ).mappings().all()
+    except DBAPIError as error:
+        print(f"Error returned: <<<{error}>>>")
+
+    print(f"USER_{user_id}_PURCHASES_WARRANTY: {ans}")
+
+    return ans
