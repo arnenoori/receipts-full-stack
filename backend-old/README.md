@@ -1,5 +1,3 @@
-# csc-365-project
-
 **Contributors:** \
 Connor O’Brien - cpobrian@calpoly.edu \
 Bryan Nguyen - bnguy266@calpoly.edu \
