@@ -4,6 +4,7 @@
 </a>
 </p>
 
+<img width="513" alt="Screenshot 2023-12-07 at 10 46 11 PM 2" src="https://github.com/arnenoori/receipts-full-stack/assets/81613773/ba5826c7-d523-4ba7-b424-2c9d957ae856">
 
 <p align="center">
 <img src="https://img.shields.io/github/contributors/arnenoori/307-project" alt="GitHub contributors" />
