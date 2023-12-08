@@ -1,9 +1,9 @@
 <p align="center">
 <a href=https://github.com/arnenoori/307-project target="_blank">
-<img src='/assets/UML.png' width="100%" alt="Banner" />
 </a>
 </p>
 
+<img width="513" alt="Screenshot 2023-12-07 at 10 46 11 PM 2" src="https://github.com/arnenoori/receipts-full-stack/assets/81613773/c85d8ad8-e86c-49d7-8ef9-698315323f42">
 
 <p align="center">
 <img src="https://img.shields.io/github/contributors/arnenoori/307-project" alt="GitHub contributors" />
