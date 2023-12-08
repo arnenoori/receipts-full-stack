@@ -252,4 +252,6 @@ export const receiptsRouter = createTRPCRouter({
 
     return data
   }),
+
 })
+
