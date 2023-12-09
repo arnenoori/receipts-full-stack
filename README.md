@@ -119,11 +119,13 @@ ext install esbenp.prettier-vscode
 
 ## Testing
 
-1. Cypress: We attempted to test our website using Cypress, but almost all of our functionality is accessable only after signin through clerk auth.
+1. Cypress: We attempted to test our website using Cypress, but almost all of our functionality is accessible only after signing in through clerk auth. Although we spent a dozen or so hours trying to get past auth, we couldn't figure out how to log in through either GitHub or google through clerk.
 
-2. Pytest: We have pytests for the majority of our old backend code in backend-old/testing.
+2. Pytest: We have pytests for the majority of our old backend code in backend-old/testing, which amounts to 2500+ lines of code.
 
-instructions: 
+Although we didn't fully complete either of the testing options, we hope that the combination of the two will suffice for this project.
+
+### Instructions for pytests: 
 
 pip install pytest
 
@@ -132,3 +134,15 @@ pytest : pytest
 pip install coverage
 
 coverage run -m pytest
+
+### Instructions for cypress:
+
+npm install cypress
+
+npx cypress open
+
+Select E2E testing
+
+Select chrome
+
+Select either spec.cy.ts or spec.cy.js
