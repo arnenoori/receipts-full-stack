@@ -121,9 +121,14 @@ ext install esbenp.prettier-vscode
 
 1. Cypress: We attempted to test our website using Cypress, but almost all of our functionality is accessable only after signin through clerk auth.
 
-2. Pytest: We have pytests for the majority of our old backend code in backend-old/testing
-    instructions: 
-    pip install pytest
-    pytest : pytest
-    pip install coverage
-    coverage run -m pytest
+2. Pytest: We have pytests for the majority of our old backend code in backend-old/testing.
+
+instructions: 
+
+pip install pytest
+
+pytest : pytest
+
+pip install coverage
+
+coverage run -m pytest
