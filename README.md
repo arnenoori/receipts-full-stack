@@ -1,5 +1,4 @@
-<p align="center">
-<a href=https://github.com/arnenoori/307-project target="_blank">
+[![Video](https://youtu.be/-qDquOm4krM/maxresdefault.jpg)](https://youtu.be/-qDquOm4krM)
 </a>
 </p>
 
@@ -7,13 +6,25 @@
 
 <p align="center">
 <img src="https://img.shields.io/github/contributors/arnenoori/307-project" alt="GitHub contributors" />
-<img src="https://img.shields.io/github/discussions/arnenoori/307-project" alt="GitHub discussions" />
 <img src="https://img.shields.io/github/issues/arnenoori/307-project" alt="GitHub issues" />
 <img src="https://img.shields.io/github/issues-pr/arnenoori/307-project" alt="GitHub pull request" />
 </p>
 
 <p></p>
 <p></p>
+
+## Project Blurb
+
+
+Our project is a simple and smart app that makes it easy to keep track of your receipts and manage your money. Since the popular app Mint closed down, there's a gap in the market for a good financial tool. Our app fills this gap.
+
+Here's what it does:
+
+1. Scan Receipts Easily: Just scan your receipts with the app. It uses OpenAI's technology to read and store them quickly.
+2. Stay On Budget: The app shows you where your money goes, helping you stick to your budget.
+3. Ask Questions: Got questions about your spending? Ask the app's finance assistant for help.
+
+In short, our app makes it easy to track your spending and get better at managing your money.
 
 ## 🔍 Table of Contents
 
@@ -33,12 +44,13 @@
 
 - Framework - [Next.js 13](https://nextjs.org/13)
 - Language - [TypeScript](https://www.typescriptlang.org)
-- Auth - [NextAuth.js](https://next-auth.js.org)
+- API Endpoints - [tRPC](https://trpc.io/)
+- Auth - [Clerk](https://clerk.com/)
 - Database - [PlanetScale](https://planetscale.com)
 - Deployment - [Vercel](https://vercel.com/docs/concepts/next.js/overview)
 - Styling - [Tailwind CSS](https://tailwindcss.com)
-- Components - [Tremor](https://www.tremor.so)
-- Analytics - [Vercel Analytics](https://vercel.com/analytics)
+- Components - [Tremor](https://www.tremor.so) & [Shadcn](https://ui.shadcn.com/)
+- ORM - [Drizzle](https://orm.drizzle.team/)
 - Linting - [ESLint](https://eslint.org)
 - Formatting - [Prettier](https://prettier.io)
 
@@ -46,42 +58,23 @@
 
 #### Your Environment Variable
 
-- Step 1
-
-- Step 2
+Create an developer account with PlanetScale, Clerk, UploadThing & OpenAI and then fill your keys in the .env.example file after renaming it to .env.local
 
 ## 🚀 Run Locally
-1.Clone the 307-project repository:
+1. Clone the 307-project repository:
 ```sh
 git clone https://github.com/arnenoori/307-project
 ```
-2.Install the dependencies with one of the package managers listed below:
+2. Install the dependencies with one of the package managers listed below:
 ```sh 
-Insert INSTALL commands 
+npm install
 ```
-3.Start the development mode:
+3. Start the development mode:
 ```sh 
-Insert RUN commands 
-
 npm run dev
 ```
 
-## 🙌 Contributors
-
-<table style="border:1px solid #404040;text-align:center;width:100%">
-<tr><td style="width:14.29%;border:1px solid #404040;">
-        <a href="https://github.com/arnenoori" spellcheck="false">
-          <img src="https://avatars.githubusercontent.com/u/19876710?v=4?s=100" width="100px;" alt="arnenoori"/>
-          <br />
-          <b>arnenoori</b>
-        </a>
-        <br />
-        <a href="https://github.com/arnenoori/307-project/commits?author=arnenoori" title="Contributions" spellcheck="false">
-          1 contribution
-        </a>
-      </td></table>
-
-## Contributing
+## Contributing Guide
 
 ```
 Style guidelines:
@@ -103,3 +96,22 @@ Or
 Can also be installed in VS Code: Launch VS Code Quick Open (Ctrl+P), paste the following command, and press enter.
 ext install esbenp.prettier-vscode
 ```
+
+## UI Prototype
+
+![Alternative Text for Image](./assets/main-screen-receipts.png)
+
+![Alternative Text for Image](./assets/detailed-receipts-overview.png)
+
+![Alternative Text for Image](./assets/receipt-manual-entry-form.png)
+
+[UI Prototype](https://www.figma.com/file/JOfZyj1V5je28YghGy0eox/Receipts?type=design&mode=design)
+
+## UML
+
+<p align="center">
+<a href=https://github.com/arnenoori/307-project target="_blank">
+</a>
+</p>
+
+<img width="513" alt="Screenshot 2023-12-07 at 10 46 11 PM 2" src="https://github.com/arnenoori/receipts-full-stack/assets/81613773/c85d8ad8-e86c-49d7-8ef9-698315323f42">
