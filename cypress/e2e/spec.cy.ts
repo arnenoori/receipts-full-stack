@@ -2,6 +2,19 @@
 
 describe('Clerk Authentication Test', () => {
   it('should sign in via Clerk after clicking "Get started"', () => {
+    // Stub the network requests to Clerk's servers
+    cy.intercept('POST', '**/clerk/sessions', {
+      statusCode: 200,
+      body: {
+        // The body should match the structure of a successful response from Clerk's servers
+        // You can find this structure in Clerk's API documentation
+        // For example:
+        id: 'session-id',
+        userId: 'user-id',
+        // ... other properties
+      },
+    });
+
     // Visit receipts.boo with failOnStatusCode set to false
     cy.visit('https://receipts.boo', { failOnStatusCode: false });
 
@@ -12,9 +25,8 @@ describe('Clerk Authentication Test', () => {
     cy.contains('Get started').click();
 
     // Perform the Clerk sign-in
-    
-    
-    });
+    cy.contains('Continue with Google').click();
+  });
 });
 
 // describe('website navigation test', () => {
